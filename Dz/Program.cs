@@ -8,84 +8,60 @@ using System.Xml;
 
 namespace Dz
 {
-    public class Car
+    public interface IComponent
     {
-        public string Brand { get; set; }
-        public string Model { get; set; }
-        public string Engine { get; set; }
-        public string Transmission { get; set; }
-        public string Color { get; set; }
+        void Operation();
+    }
 
-        public void DisplayInfo()
+    public class ConcreteComponent : IComponent
+    {
+        public void Operation()
         {
-            Console.WriteLine($"Brand: {Brand}");
-            Console.WriteLine($"Model: {Model}");
-            Console.WriteLine($"Engine: {Engine}");
-            Console.WriteLine($"Transmission: {Transmission}");
-            Console.WriteLine($"Color: {Color}");
-            Console.WriteLine();
+            Console.WriteLine("Базова операція");
+        }
+    }
+    
+    public abstract class Decorator : IComponent
+    {
+        protected IComponent component;
+
+        public Decorator(IComponent component)
+        {
+            this.component = component;
+        }
+
+        public virtual void Operation()
+        {
+            if (component != null)
+            {
+                component.Operation();
+            }
         }
     }
 
-    // Базовий інтерфейс для будівника автомобілів
-    public interface ICarBuilder
+    public class ConcreteDecoratorA : Decorator
     {
-        void BuildBrand();
-        void BuildModel();
-        void BuildEngine();
-        void BuildTransmission();
-        void BuildColor();
-        Car GetCar();
-    }
-
-    // Конкретний будівник для створення спортивного автомобіля
-    public class SportsCarBuilder : ICarBuilder
-    {
-        private Car car = new Car();
-
-        public void BuildBrand()
+        public ConcreteDecoratorA(IComponent component) : base(component)
         {
-            car.Brand = "Ferrari";
         }
 
-        public void BuildModel()
+        public override void Operation()
         {
-            car.Model = "488 GTB";
-        }
-
-        public void BuildEngine()
-        {
-            car.Engine = "V8 Twin Turbo";
-        }
-
-        public void BuildTransmission()
-        {
-            car.Transmission = "7-speed dual-clutch";
-        }
-
-        public void BuildColor()
-        {
-            car.Color = "Red";
-        }
-
-        public Car GetCar()
-        {
-            return car;
+            base.Operation();
+            Console.WriteLine("Додатковий функціонал A");
         }
     }
 
-    // Директор, який визначає порядок створення автомобіля
-    public class CarDirector
+    public class ConcreteDecoratorB : Decorator
     {
-        public Car Construct(ICarBuilder builder)
+        public ConcreteDecoratorB(IComponent component) : base(component)
         {
-            builder.BuildBrand();
-            builder.BuildModel();
-            builder.BuildEngine();
-            builder.BuildTransmission();
-            builder.BuildColor();
+        }
 
-            return builder.GetCar();
+        public override void Operation()
+        {
+            base.Operation();
+            Console.WriteLine("Додатковий функціонал B");
         }
     }
 
@@ -93,14 +69,12 @@ namespace Dz
     {
         static void Main()
         {
-            // Використання патерну Будівник
-            CarDirector director = new CarDirector();
-            ICarBuilder sportsCarBuilder = new SportsCarBuilder();
+            IComponent component = new ConcreteComponent();
 
-            Car sportsCar = director.Construct(sportsCarBuilder);
-            sportsCar.DisplayInfo();
+            IComponent decoratedComponentA = new ConcreteDecoratorA(component);
+            IComponent decoratedComponentB = new ConcreteDecoratorB(decoratedComponentA);
 
-            Console.ReadLine();
+            decoratedComponentB.Operation();
         }
     }
 }
