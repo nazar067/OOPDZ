@@ -8,73 +8,99 @@ using System.Xml;
 
 namespace Dz
 {
-    public abstract class Сomponents
+    public class Car
     {
-        public abstract void getСomponent();
-    }
-    class Processor : Сomponents
-    {
-        public int Frequency { get; set; }
-        public int Cores { get; set; }
+        public string Brand { get; set; }
+        public string Model { get; set; }
+        public string Engine { get; set; }
+        public string Transmission { get; set; }
+        public string Color { get; set; }
 
-        public Processor(int frequency, int cores)
+        public void DisplayInfo()
         {
-            Frequency = frequency;
-            Cores = cores;
-        }
-
-        public override void getСomponent()
-        {
-            Console.WriteLine(Frequency.ToString(), Cores);
-        }
-    }
-    class RAM : Сomponents
-    {
-        public int Memory { get; set; }
-        public int Speed { get; set; }
-        public RAM(int memory, int speed)
-        {
-            Memory = memory;
-            Speed = speed;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Memory);
-            Console.WriteLine(Speed);
-        }
-    }
-    class Motherboard : Сomponents
-    {
-        public int Chipset { get; set; }
-
-        public Motherboard(int chipset)
-        {
-            Chipset = chipset;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Chipset);
+            Console.WriteLine($"Brand: {Brand}");
+            Console.WriteLine($"Model: {Model}");
+            Console.WriteLine($"Engine: {Engine}");
+            Console.WriteLine($"Transmission: {Transmission}");
+            Console.WriteLine($"Color: {Color}");
+            Console.WriteLine();
         }
     }
 
-
-    internal class Program
+    // Базовий інтерфейс для будівника автомобілів
+    public interface ICarBuilder
     {
-        static void Main(string[] args)
-        {
-            RAM ram = new RAM(10, 4);
-            ram.getСomponent();
+        void BuildBrand();
+        void BuildModel();
+        void BuildEngine();
+        void BuildTransmission();
+        void BuildColor();
+        Car GetCar();
+    }
 
-            Сomponents[] сomponents = new Сomponents[]
-            {
-                new Processor(10, 8),
-                new RAM(10, 8),
-                new Motherboard(550)
-            };
-            foreach(var component in сomponents)
-            {
-                component.getСomponent();
-            }
+    // Конкретний будівник для створення спортивного автомобіля
+    public class SportsCarBuilder : ICarBuilder
+    {
+        private Car car = new Car();
+
+        public void BuildBrand()
+        {
+            car.Brand = "Ferrari";
+        }
+
+        public void BuildModel()
+        {
+            car.Model = "488 GTB";
+        }
+
+        public void BuildEngine()
+        {
+            car.Engine = "V8 Twin Turbo";
+        }
+
+        public void BuildTransmission()
+        {
+            car.Transmission = "7-speed dual-clutch";
+        }
+
+        public void BuildColor()
+        {
+            car.Color = "Red";
+        }
+
+        public Car GetCar()
+        {
+            return car;
+        }
+    }
+
+    // Директор, який визначає порядок створення автомобіля
+    public class CarDirector
+    {
+        public Car Construct(ICarBuilder builder)
+        {
+            builder.BuildBrand();
+            builder.BuildModel();
+            builder.BuildEngine();
+            builder.BuildTransmission();
+            builder.BuildColor();
+
+            return builder.GetCar();
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            // Використання патерну Будівник
+            CarDirector director = new CarDirector();
+            ICarBuilder sportsCarBuilder = new SportsCarBuilder();
+
+            Car sportsCar = director.Construct(sportsCarBuilder);
+            sportsCar.DisplayInfo();
+
+            Console.ReadLine();
         }
     }
 }
