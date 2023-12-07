@@ -13,11 +13,11 @@ namespace Dz
         void Operation();
     }
 
-    public class ConcreteComponent : IComponent
+    public class Falcon : IComponent
     {
         public void Operation()
         {
-            Console.WriteLine("Базова операція");
+            Console.WriteLine("Запуск Falcon 9");
         }
     }
     
@@ -39,29 +39,29 @@ namespace Dz
         }
     }
 
-    public class ConcreteDecoratorA : Decorator
+    public class RocketStageA : Decorator
     {
-        public ConcreteDecoratorA(IComponent component) : base(component)
+        public RocketStageA(IComponent component) : base(component)
         {
         }
 
         public override void Operation()
         {
             base.Operation();
-            Console.WriteLine("Додатковий функціонал A");
+            Console.WriteLine("Знищеня ступеня А");
         }
     }
 
-    public class ConcreteDecoratorB : Decorator
+    public class RocketStageB : Decorator
     {
-        public ConcreteDecoratorB(IComponent component) : base(component)
+        public RocketStageB(IComponent component) : base(component)
         {
         }
 
         public override void Operation()
         {
             base.Operation();
-            Console.WriteLine("Додатковий функціонал B");
+            Console.WriteLine("Знищеня ступеня B");
         }
     }
 
@@ -69,10 +69,10 @@ namespace Dz
     {
         static void Main()
         {
-            IComponent component = new ConcreteComponent();
+            IComponent component = new Falcon();
 
-            IComponent decoratedComponentA = new ConcreteDecoratorA(component);
-            IComponent decoratedComponentB = new ConcreteDecoratorB(decoratedComponentA);
+            IComponent decoratedComponentA = new RocketStageA(component);
+            IComponent decoratedComponentB = new RocketStageB(decoratedComponentA);
 
             decoratedComponentB.Operation();
         }
