@@ -8,73 +8,73 @@ using System.Xml;
 
 namespace Dz
 {
-    public abstract class Сomponents
+    public interface IComponent
     {
-        public abstract void getСomponent();
-    }
-    class Processor : Сomponents
-    {
-        public int Frequency { get; set; }
-        public int Cores { get; set; }
-
-        public Processor(int frequency, int cores)
-        {
-            Frequency = frequency;
-            Cores = cores;
-        }
-
-        public override void getСomponent()
-        {
-            Console.WriteLine(Frequency.ToString(), Cores);
-        }
-    }
-    class RAM : Сomponents
-    {
-        public int Memory { get; set; }
-        public int Speed { get; set; }
-        public RAM(int memory, int speed)
-        {
-            Memory = memory;
-            Speed = speed;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Memory);
-            Console.WriteLine(Speed);
-        }
-    }
-    class Motherboard : Сomponents
-    {
-        public int Chipset { get; set; }
-
-        public Motherboard(int chipset)
-        {
-            Chipset = chipset;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Chipset);
-        }
+        void Operation();
     }
 
-
-    internal class Program
+    public class Falcon : IComponent
     {
-        static void Main(string[] args)
+        public void Operation()
         {
-            RAM ram = new RAM(10, 4);
-            ram.getСomponent();
+            Console.WriteLine("Запуск Falcon 9");
+        }
+    }
+    
+    public abstract class Decorator : IComponent
+    {
+        protected IComponent component;
 
-            Сomponents[] сomponents = new Сomponents[]
+        public Decorator(IComponent component)
+        {
+            this.component = component;
+        }
+
+        public virtual void Operation()
+        {
+            if (component != null)
             {
-                new Processor(10, 8),
-                new RAM(10, 8),
-                new Motherboard(550)
-            };
-            foreach(var component in сomponents)
-            {
-                component.getСomponent();
+                component.Operation();
             }
+        }
+    }
+
+    public class RocketStageA : Decorator
+    {
+        public RocketStageA(IComponent component) : base(component)
+        {
+        }
+
+        public override void Operation()
+        {
+            base.Operation();
+            Console.WriteLine("Знищеня ступеня А");
+        }
+    }
+
+    public class RocketStageB : Decorator
+    {
+        public RocketStageB(IComponent component) : base(component)
+        {
+        }
+
+        public override void Operation()
+        {
+            base.Operation();
+            Console.WriteLine("Знищеня ступеня B");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+            IComponent component = new Falcon();
+
+            IComponent decoratedComponentA = new RocketStageA(component);
+            IComponent decoratedComponentB = new RocketStageB(decoratedComponentA);
+
+            decoratedComponentB.Operation();
         }
     }
 }
