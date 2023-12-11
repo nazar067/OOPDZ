@@ -8,73 +8,90 @@ using System.Xml;
 
 namespace Dz
 {
-    public abstract class Сomponents
+    public interface IObserver
     {
-        public abstract void getСomponent();
-    }
-    class Processor : Сomponents
-    {
-        public int Frequency { get; set; }
-        public int Cores { get; set; }
-
-        public Processor(int frequency, int cores)
-        {
-            Frequency = frequency;
-            Cores = cores;
-        }
-
-        public override void getСomponent()
-        {
-            Console.WriteLine(Frequency.ToString(), Cores);
-        }
-    }
-    class RAM : Сomponents
-    {
-        public int Memory { get; set; }
-        public int Speed { get; set; }
-        public RAM(int memory, int speed)
-        {
-            Memory = memory;
-            Speed = speed;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Memory);
-            Console.WriteLine(Speed);
-        }
-    }
-    class Motherboard : Сomponents
-    {
-        public int Chipset { get; set; }
-
-        public Motherboard(int chipset)
-        {
-            Chipset = chipset;
-        }
-        public override void getСomponent()
-        {
-            Console.WriteLine(Chipset);
-        }
+        void Update(string message);
     }
 
-
-    internal class Program
+    public class Rocket
     {
-        static void Main(string[] args)
-        {
-            RAM ram = new RAM(10, 4);
-            ram.getСomponent();
+        private List<IObserver> observers = new List<IObserver>();
+        private string state;
 
-            Сomponents[] сomponents = new Сomponents[]
+        public string State
+        {
+            get { return state; }
+            set
             {
-                new Processor(10, 8),
-                new RAM(10, 8),
-                new Motherboard(550)
-            };
-            foreach(var component in сomponents)
-            {
-                component.getСomponent();
+                state = value;
+                NotifyObservers();
             }
+        }
+
+        
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        
+        private void NotifyObservers()
+        {
+            foreach (var observer in observers)
+            {
+                observer.Update(State);
+            }
+        }
+    }
+
+   
+    public class Camera : IObserver
+    {
+        private string name;
+
+        public Camera(string name)
+        {
+            this.name = name;
+        }
+
+        
+        public void Update(string message)
+        {
+            Console.WriteLine($"{name} отримав повідомлення: {message}");
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
+           
+            Rocket rocket = new Rocket();
+
+           
+            Camera camera1 = new Camera("Camera 1");
+            Camera camera2 = new Camera("Camera 2");
+
+           
+            rocket.Attach(camera1);
+            rocket.Attach(camera2);
+
+           
+            rocket.State = "Новий стан";
+
+            
+            rocket.Detach(camera1);
+
+            
+            rocket.State = "Ще один новий стан";
+
+            Console.ReadLine();
         }
     }
 }
