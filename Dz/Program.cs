@@ -8,84 +8,62 @@ using System.Xml;
 
 namespace Dz
 {
-    public class Car
+    public interface IObserver
     {
-        public string Brand { get; set; }
-        public string Model { get; set; }
-        public string Engine { get; set; }
-        public string Transmission { get; set; }
-        public string Color { get; set; }
+        void Update(string message);
+    }
 
-        public void DisplayInfo()
+    public class Rocket
+    {
+        private List<IObserver> observers = new List<IObserver>();
+        private string state;
+
+        public string State
         {
-            Console.WriteLine($"Brand: {Brand}");
-            Console.WriteLine($"Model: {Model}");
-            Console.WriteLine($"Engine: {Engine}");
-            Console.WriteLine($"Transmission: {Transmission}");
-            Console.WriteLine($"Color: {Color}");
-            Console.WriteLine();
+            get { return state; }
+            set
+            {
+                state = value;
+                NotifyObservers();
+            }
+        }
+
+        
+        public void Attach(IObserver observer)
+        {
+            observers.Add(observer);
+        }
+
+        
+        public void Detach(IObserver observer)
+        {
+            observers.Remove(observer);
+        }
+
+        
+        private void NotifyObservers()
+        {
+            foreach (var observer in observers)
+            {
+                observer.Update(State);
+            }
         }
     }
 
-    // Базовий інтерфейс для будівника автомобілів
-    public interface ICarBuilder
+   
+    public class Camera : IObserver
     {
-        void BuildBrand();
-        void BuildModel();
-        void BuildEngine();
-        void BuildTransmission();
-        void BuildColor();
-        Car GetCar();
-    }
+        private string name;
 
-    // Конкретний будівник для створення спортивного автомобіля
-    public class SportsCarBuilder : ICarBuilder
-    {
-        private Car car = new Car();
-
-        public void BuildBrand()
+        public Camera(string name)
         {
-            car.Brand = "Ferrari";
+            this.name = name;
         }
 
-        public void BuildModel()
+        
+        public void Update(string message)
         {
-            car.Model = "488 GTB";
-        }
-
-        public void BuildEngine()
-        {
-            car.Engine = "V8 Twin Turbo";
-        }
-
-        public void BuildTransmission()
-        {
-            car.Transmission = "7-speed dual-clutch";
-        }
-
-        public void BuildColor()
-        {
-            car.Color = "Red";
-        }
-
-        public Car GetCar()
-        {
-            return car;
-        }
-    }
-
-    // Директор, який визначає порядок створення автомобіля
-    public class CarDirector
-    {
-        public Car Construct(ICarBuilder builder)
-        {
-            builder.BuildBrand();
-            builder.BuildModel();
-            builder.BuildEngine();
-            builder.BuildTransmission();
-            builder.BuildColor();
-
-            return builder.GetCar();
+            Console.WriteLine($"{name} отримав повідомлення: {message}");
         }
     }
 
@@ -93,12 +71,25 @@ namespace Dz
     {
         static void Main()
         {
-            // Використання патерну Будівник
-            CarDirector director = new CarDirector();
-            ICarBuilder sportsCarBuilder = new SportsCarBuilder();
+           
+            Rocket rocket = new Rocket();
 
-            Car sportsCar = director.Construct(sportsCarBuilder);
-            sportsCar.DisplayInfo();
+           
+            Camera camera1 = new Camera("Camera 1");
+            Camera camera2 = new Camera("Camera 2");
+
+           
+            rocket.Attach(camera1);
+            rocket.Attach(camera2);
+
+           
+            rocket.State = "Новий стан";
+
+            
+            rocket.Detach(camera1);
+
+            
+            rocket.State = "Ще один новий стан";
 
             Console.ReadLine();
         }
